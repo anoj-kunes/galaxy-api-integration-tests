@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
 import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.API_KEY_HEADERS;
-import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.createDefaultTicketActivationExpectations;
 import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.createDefaultRequest;
 import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.createDefaultResponse;
+import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.createDefaultTicketDeactivationExpectations;
 import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.forbiddenAccess;
 import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.ticketCannotBeActivatedError;
 import static com.leisurepassgroup.galaxyapimock.expectation.TicketExpectation.unauthorizedAccess;
@@ -21,24 +21,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.verify.VerificationTimes.exactly;
 
-public class ActivateTicketTests extends BaseTests {
+public class DeactivateTicketTests extends BaseTests {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private RestTemplate restTemplate = getRestTemplate();
-    private TicketClientService ticketClientService = new TicketClientServiceImpl(restTemplate);
 
     @BeforeAll
     public static void setupExpectations() throws JsonProcessingException {
-        createDefaultTicketActivationExpectations(mockServer);
+        createDefaultTicketDeactivationExpectations(mockServer);
     }
 
     @Test
-    public void activateTicket_ticketActivatedSuccessfully_methodCalledAndReturns() throws JsonProcessingException {
-        var output = ticketClientService.activateTicket(101, createDefaultRequest());
+    public void deactivateTicket_ticketDeactivatedSuccessfully_methodCalledAndReturns() throws JsonProcessingException {
+        var output = ticketClientService.deactivateTicket(101, createDefaultRequest());
         mockServer.verify(
                 request()
-                        .withMethod("POST")
                         .withHeader(API_KEY_HEADERS)
+                        .withMethod("DELETE")
                         .withBody(objectMapper.writeValueAsString(createDefaultRequest()))
                         .withPath("/api/tickets/101/activations"),
                 exactly(1)
@@ -48,12 +45,12 @@ public class ActivateTicketTests extends BaseTests {
     }
 
     @Test
-    public void activateTicket_ticketCannotBeActivated_throwsApiException() throws JsonProcessingException {
-        var error = assertThrows(ApiException.class, () -> ticketClientService.activateTicket(102, createDefaultRequest()));
+    public void deactivateTicket_ticketCannotBeActivated_throwsApiException() throws JsonProcessingException {
+        var error = assertThrows(ApiException.class, () -> ticketClientService.deactivateTicket(102, createDefaultRequest()));
 
         mockServer.verify(
                 request()
-                        .withMethod("POST")
+                        .withMethod("DELETE")
                         .withHeader(API_KEY_HEADERS)
                         .withBody(objectMapper.writeValueAsString(createDefaultRequest()))
                         .withPath("/api/tickets/102/activations"),
@@ -64,11 +61,11 @@ public class ActivateTicketTests extends BaseTests {
     }
 
     @Test
-    public void activateTicket_forbiddenAccess_throwsApiException() throws JsonProcessingException {
-        var error = assertThrows(ApiException.class, () -> ticketClientService.activateTicket(103, createDefaultRequest()));
+    public void deactivateTicket_forbiddenAccess_throwsApiException() throws JsonProcessingException {
+        var error = assertThrows(ApiException.class, () -> ticketClientService.deactivateTicket(103, createDefaultRequest()));
         mockServer.verify(
                 request()
-                        .withMethod("POST")
+                        .withMethod("DELETE")
                         .withHeader(API_KEY_HEADERS)
                         .withBody(objectMapper.writeValueAsString(createDefaultRequest()))
                         .withPath("/api/tickets/103/activations"),
@@ -79,11 +76,11 @@ public class ActivateTicketTests extends BaseTests {
     }
 
     @Test
-    public void activateTicket_unauthorizedAccess_throwsApiException() throws JsonProcessingException {
-        var error = assertThrows(ApiException.class, () -> ticketClientService.activateTicket(104, createDefaultRequest()));
+    public void deactivateTicket_unauthorizedAccess_throwsApiException() throws JsonProcessingException {
+        var error = assertThrows(ApiException.class, () -> ticketClientService.deactivateTicket(104, createDefaultRequest()));
         mockServer.verify(
                 request()
-                        .withMethod("POST")
+                        .withMethod("DELETE")
                         .withHeader(API_KEY_HEADERS)
                         .withBody(objectMapper.writeValueAsString(createDefaultRequest()))
                         .withPath("/api/tickets/104/activations"),

@@ -1,8 +1,11 @@
 # Galaxy Api Integration Tests
-Integration testing with ticket API provided from galaxy connect
+Integration testing with ticket API provided from galaxy connect.
 
 ## Postman API Documentation
-N/A
+API documentation for mock-server deployed on:
+
+- [dev](https://www.getpostman.com/collections/d25297bdc9e7c7537171)
+
 
 ## Release notes:
 ### 0.0.1

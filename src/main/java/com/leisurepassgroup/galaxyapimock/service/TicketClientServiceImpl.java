@@ -2,6 +2,7 @@ package com.leisurepassgroup.galaxyapimock.service;
 
 import com.leisurepassgroup.galaxyapimock.exception.api.ApiErrorHandler;
 import com.leisurepassgroup.galaxyapimock.model.request.TicketActivationRequest;
+import com.leisurepassgroup.galaxyapimock.model.request.TicketUsageRequest;
 import com.leisurepassgroup.galaxyapimock.model.response.TicketActivationResponse;
 import com.leisurepassgroup.galaxyapimock.model.response.TicketUsageResponse;
 import org.springframework.http.HttpEntity;
@@ -36,7 +37,7 @@ public class TicketClientServiceImpl implements TicketClientService {
         return response;
     }
 
-    public TicketUsageResponse ticketUsage(Integer ticketNumber, TicketUsageResponse request) {
+    public TicketUsageResponse ticketUsage(Integer ticketNumber, TicketUsageRequest request) {
         var httpEntity = new HttpEntity<>(request, getHeaders());
         var response = restTemplate.exchange(URL + TICKET_USAGES_URL, POST, httpEntity, TicketUsageResponse.class, ticketNumber).getBody();
         return response;

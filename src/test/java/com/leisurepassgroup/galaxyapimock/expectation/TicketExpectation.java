@@ -17,17 +17,17 @@ import static org.mockserver.matchers.Times.once;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-public class ActivationTicketExpectation {
+public class TicketExpectation {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String ACTIVATE_TICKET_URL = "/api/tickets/%s/activations";
+    private static final String TICKET_URL = "/api/tickets/%s/activations";
     public static final Header API_KEY_HEADERS = new Header("x-api-key", "abcdef12345");
 
     public static final String PRODUCT_CODE = "PC01";
     public static final String SUPPLIER_NAME = "LPG_INTEGRATION_TEST";
     public static final String CORRELATION_ID = UUID.randomUUID().toString();
 
-    public static void createDefaultExpectations(ClientAndServer mockServer) throws JsonProcessingException {
+    public static void createDefaultTicketActivationExpectations(ClientAndServer mockServer) throws JsonProcessingException {
         // success
         activateTicket(
                 mockServer,
@@ -89,12 +89,90 @@ public class ActivationTicketExpectation {
         );
     }
 
+    public static void createDefaultTicketDeactivationExpectations(ClientAndServer mockServer) throws JsonProcessingException {
+        // success
+        deactivateTicket(
+                mockServer,
+                API_KEY_HEADERS,
+                101,
+                createDefaultRequest(),
+                createDefaultResponse(101, null),
+                201
+        );
+
+        // fail - Bad Request - Error Code 1420
+        deactivateTicket(
+                mockServer,
+                API_KEY_HEADERS,
+                102,
+                createDefaultRequest(),
+                ticketCannotBeActivatedError(),
+                400
+        );
+
+        // fail - Forbidden - Error Code 906
+        deactivateTicket(
+                mockServer,
+                API_KEY_HEADERS,
+                103,
+                createDefaultRequest(),
+                forbiddenAccess(),
+                401
+        );
+
+        // fail - Unauthorized - Error Code 5
+        deactivateTicket(
+                mockServer,
+                API_KEY_HEADERS,
+                104,
+                createDefaultRequest(),
+                unauthorizedAccess(),
+                401
+        );
+
+        // fail - NotFound - Error Code 200
+        deactivateTicket(
+                mockServer,
+                API_KEY_HEADERS,
+                105,
+                createDefaultRequest(),
+                productNotFound(),
+                403
+        );
+
+        // fail - conflict - Error Code 4
+        deactivateTicket(
+                mockServer,
+                API_KEY_HEADERS,
+                106,
+                createDefaultRequest(),
+                conflict(),
+                409
+        );
+    }
+
+    private static void deactivateTicket(ClientAndServer mockServer, Header header, Integer ticketNumber, TicketActivationRequest request, Object response, Integer statusCode) throws JsonProcessingException {
+        mockServer.when(
+                request()
+                        .withHeader(header)
+                        .withMethod("DELETE")
+                        .withPath(format(TICKET_URL, ticketNumber))
+                        .withBody(objectMapper.writeValueAsString(request)),
+                once()
+        ).respond(
+                response()
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(statusCode)
+                        .withBody(objectMapper.writeValueAsString(response))
+        );
+    }
+
     private static void activateTicket(ClientAndServer mockServer, Header header, Integer ticketNumber, TicketActivationRequest request, Object response, Integer statusCode) throws JsonProcessingException {
         mockServer.when(
                 request()
                         .withHeader(header)
                         .withMethod("POST")
-                        .withPath(format(ACTIVATE_TICKET_URL, ticketNumber))
+                        .withPath(format(TICKET_URL, ticketNumber))
                         .withBody(objectMapper.writeValueAsString(request)),
                 once()
         ).respond(

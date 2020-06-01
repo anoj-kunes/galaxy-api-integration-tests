@@ -1,5 +1,8 @@
 package com.leisurepassgroup.galaxyapimock.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leisurepassgroup.galaxyapimock.service.TicketClientService;
+import com.leisurepassgroup.galaxyapimock.service.TicketClientServiceImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockserver.integration.ClientAndServer;
@@ -10,7 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 public abstract class BaseTests {
-    static ClientAndServer mockServer;
+    protected final ObjectMapper objectMapper = new ObjectMapper();
+    protected TicketClientService ticketClientService = new TicketClientServiceImpl(getRestTemplate());
+
+    protected static ClientAndServer mockServer;
 
     @BeforeAll
     public static void setupServer() {
