@@ -1,0 +1,60 @@
+buildscript {
+	dependencies {
+		classpath 'org.owasp:dependency-check-gradle:5.3.0'
+	}
+	repositories {
+		mavenCentral {
+			url "${artifactory_contextUrl}/virt-elpaso"
+			credentials {
+				username = "${artifactory_user}"
+				password = "${artifactory_password}"
+			}
+			name = "artifactory-proxy"
+		}
+	}
+}
+
+
+plugins {
+	id 'org.springframework.boot' version '2.3.0.RELEASE'
+	id 'org.unbroken-dome.test-sets' version '2.2.1'
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.owasp.dependencycheck'
+
+group = 'com.leisurepassgroup'
+version = '0.0.1'
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+	add buildscript.repositories.getByName("artifactory-proxy")
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.apache.httpcomponents:httpclient:4.5.12'
+	implementation 'org.codehaus.groovy:groovy'
+	implementation('commons-io:commons-io:2.6')
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	testImplementation("org.mock-server:mockserver-netty:5.10.0")
+	testImplementation("org.mock-server:mockserver-client-java:5.10.0")
+}
+
+test {
+	useJUnitPlatform()
+}
